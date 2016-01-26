@@ -1,0 +1,28 @@
+import java.io.*;
+import java.net.*;
+public class MainServer {
+    static final int port_number=8888;
+    static Socket mySocket = null;
+    static ServerSocket serverSocket = null;
+    public static DatabaseServerPeerOperations[] databaseserverlist=new DatabaseServerPeerOperations[3];
+    public static void main(String args[]) {
+       System.out.println("server Started : ");
+       databaseserverlist[0]= new DatabaseServerPeerOperations("127.0.0.1", "9901");
+       databaseserverlist[1]= new DatabaseServerPeerOperations("127.0.0.1", "9902");
+    
+       try {
+        serverSocket = new ServerSocket(port_number);
+       } catch (IOException e) {
+           System.out.println(e);
+       }
+       while (true) {
+        try {
+            mySocket = serverSocket.accept();
+            new ServerThread(mySocket,databaseserverlist).start();
+            
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+       }
+    }
+}
