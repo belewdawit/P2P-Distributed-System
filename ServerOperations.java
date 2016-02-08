@@ -64,7 +64,7 @@ public class ServerOperations {
         }
         CloseConnection();
     }
-    public String RegisterFiles(String[] list) {
+    public String RegisterFiles(String[] list,int fragmentNumber) {
         CreateConnection();
         String result = "";
         String[] row;
@@ -72,11 +72,13 @@ public class ServerOperations {
         for (int i = 3; i < list.length; i++) {
             row = list[i].split(",,,");
             for (int j = 0; j < Integer.parseInt(row[1]) / Chunk_Size + 1; j++) {
-                sql = "INSERT INTO "+table_name+"( `ipaddress`, `port`, `filename`, `size`, `chunknumber`) VALUES ('" + list[1] + "', '" + list[2] + "', '" + row[0] + "', '" + row[1] + "', '" + j + "');";
-                try {
-                    stmt.executeUpdate(sql);
-                } catch (SQLException ex) {
-                    System.out.println("sql exception @ server operations RegisterFiles method");
+                if(fragmentNumber%3==j%3){
+                    sql = "INSERT INTO "+table_name+"(`ipaddress`, `port`, `filename`, `size`, `chunknumber`) VALUES ('" + list[1] + "', '" + list[2] + "', '" + row[0] + "', '" + row[1] + "', '" + j + "');";
+                    try {
+                      stmt.executeUpdate(sql);
+                    } catch (SQLException ex) {
+                     System.out.println("sql exception @ server operations RegisterFiles method");
+                    }
                 }
             }
             result += "'" + row[0] + "' (" + row[1] + " bytes ) is SuccessFully registered!\n";
@@ -135,13 +137,13 @@ public class ServerOperations {
         CloseConnection();
         return result;
     }
-    public String chunkRequest(String filename, String size) {
+    public String chunkRequest(String filename, String size,String chunkNo) {
         CreateConnection();
         String result = "";
         String current = "";
         String[] Chunklist;
         ResultSet rs = null;
-        sql = "select * from "+table_name+" Where `filename`= '" + filename + "' and `size`= '" + size + "'";
+        sql = "select * from "+table_name+" Where `filename`= '" + filename + "' and `size`= '" + size+ "' and `chunknumber`= '" + chunkNo+ "'";
         System.out.println("chunk Request");
         try {
             rs = stmt.executeQuery(sql);
