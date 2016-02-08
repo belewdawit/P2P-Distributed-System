@@ -22,22 +22,32 @@ class ServerThread extends Thread {
                 while (true) {
                     try {
                         line = myInputStream.readUTF();
+                        int fragmentNumber;
+                        
+                        if(line.split("#-#").length>1){
+                            fragmentNumber =Integer.parseInt(line.split("#-#")[0]);
+                            line=line.split("#-#")[1];
+                        }
+                        else{
+                            fragmentNumber=0;
+                        }
+                        
                         splited = line.split("###");
                         if (line.startsWith("0")) {
-                            myDataOutPutStream.writeUTF(serveroperations.RegisterFiles(splited));
+                            myDataOutPutStream.writeUTF(serveroperations.RegisterFiles(splited,fragmentNumber));
                             System.out.println("file register Request (" + line + ")");
                         } else if (line.startsWith("1")) {
                             myDataOutPutStream.writeUTF(serveroperations.getListOfFiles());
                             System.out.println("file list Request (" + line + ")");
                         } 
                         else if (line.startsWith("3")) {
+                            System.out.println("leave Request (" + splited[1]+","+splited[2]+ ")");
                             myDataOutPutStream.writeUTF(serveroperations.leaveRequest(splited[1], splited[2]));
-                            System.out.println("leave Request (" + line + ")");
                         } else if (line.startsWith("4")) {
                             myDataOutPutStream.writeUTF(serveroperations.chunkRegister(splited));
                             System.out.println("chunk register Request (" + line + ")");
                         } else if (line.startsWith("5")) {
-                            myDataOutPutStream.writeUTF(serveroperations.chunkRequest(splited[1],splited[2]));
+                            myDataOutPutStream.writeUTF(serveroperations.chunkRequest(splited[1],splited[2],splited[3]));
                             System.out.println("chunk register Request (" + line + ")");
                         }
                     } catch (EOFException eofe) {
