@@ -20,8 +20,9 @@ public class MainServer {
             try {
                 mySocket = serverSocket.accept();
                 new ServerThread(mySocket,port_number).start();
-            } catch (IOException e) {
+            } catch (IOException e) { // to catch exceptions
                 System.out.println(e);
+                
             }
         }
     }
